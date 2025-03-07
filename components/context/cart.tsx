@@ -26,7 +26,7 @@ interface Context {
     increaseQuantity: (id: number) => void;
     decreaseQuantity: (id: number) => void;
     clearCart: () => void;
-    isInCart: (id: number) => boolean;
+    getQuantity: (id: number) => number;
   };
   state: State;
 }
@@ -79,11 +79,13 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
       case "DECREASE_QUANTITY":
         return {
           ...state,
-          cart: state.cart.map((item) =>
-            item.id === action.id && (item.quantity || 0) > 1
-              ? { ...item, quantity: (item.quantity || 0) - 1 }
-              : item
-          ),
+          cart: state.cart
+            .map((item) =>
+              item.id === action.id
+                ? { ...item, quantity: (item.quantity || 0) - 1 }
+                : item
+            )
+            .filter((item) => (item.quantity || 0) > 0),
         };
       case "CLEAR_CART":
         return { ...state, cart: [] };
@@ -102,7 +104,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
       decreaseQuantity: (id: number) =>
         dispatch({ type: "DECREASE_QUANTITY", id }),
       clearCart: () => dispatch({ type: "CLEAR_CART" }),
-      isInCart: (id: number) => state.cart.some((item) => item.id === id),
+      getQuantity: (id: number) =>
+        state.cart.find((item) => item.id === id)?.quantity || 0,
     }),
     [state.cart]
   );

@@ -8,19 +8,16 @@ import { ThemedView } from "@/components/ThemedView";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import { Flex, ScrollView } from "@/components/styled";
 import { useCart } from "@/components/context/cart";
+import ProductCards from "@/components/ProductCard";
 
 export default function Cart() {
-  const cart = useCart();
+  const {
+    state: { cart },
+  } = useCart();
   return (
     <ScrollView>
       <ThemedText>Cart</ThemedText>
-      {cart.state.cart.map((product) => (
-        <Flex key={product.id}>
-          <ThemedText>{product.name}</ThemedText>
-          <ThemedText>{product.price}</ThemedText>
-          <ThemedText>{product.quantity}</ThemedText>
-        </Flex>
-      ))}
+      <ProductCards products={cart} />
     </ScrollView>
   );
 }

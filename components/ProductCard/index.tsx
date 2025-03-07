@@ -10,11 +10,12 @@ interface Props {
     id: number;
     name: string;
     price: number;
+    quantity?: number;
   }[];
 }
 const ProductCards = ({ products }: Props) => {
   const {
-    cartContext: { addToCart },
+    cartContext: { addToCart, increaseQuantity, decreaseQuantity, getQuantity },
   } = useCart();
   return (
     <>
@@ -32,10 +33,16 @@ const ProductCards = ({ products }: Props) => {
               {product.price.toFixed(2)} / unit
             </Text>
           </View>
-          <Button
-            text="Add to cart"
-            onPress={() => addToCart(product)}
-          ></Button>
+
+          {getQuantity(product.id) > 0 ? (
+            <Flex>
+              <Button text="-" onPress={() => decreaseQuantity(product.id)} />
+              <Text>{getQuantity(product.id)}</Text>
+              <Button text="+" onPress={() => increaseQuantity(product.id)} />
+            </Flex>
+          ) : (
+            <Button text="Add to cart" onPress={() => addToCart(product)} />
+          )}
         </Flex>
       ))}
     </>
