@@ -1,9 +1,15 @@
-import React from "react";
-import { Flex } from "../styled";
-import { Image, StyleSheet, View } from "react-native";
+import React, { useState } from "react";
+import {
+  ActivityIndicator,
+  FlatList,
+  Image,
+  StyleSheet,
+  View,
+} from "react-native";
 import Text from "../Text";
 import Button from "../Button";
 import { useCart } from "../context/cart";
+import { Flex } from "../styled";
 
 interface Props {
   products?: {
@@ -12,42 +18,59 @@ interface Props {
     price: number;
     quantity?: number;
   }[];
+  loading?: boolean;
+  loadMoreProducts?: () => void;
 }
-const ProductCards = ({ products }: Props) => {
+
+const ProductCards = ({ products, loadMoreProducts, loading }: Props) => {
   const {
     cartContext: { addToCart, increaseQuantity, decreaseQuantity, getQuantity },
   } = useCart();
   return (
     <>
-      {products?.map((product) => (
-        <Flex key={product.id} style={styles.card}>
-          <Image
-            source={{ uri: "https://placehold.co/76" }}
-            style={styles.productImg}
-          />
-          <View style={styles.productInfo}>
-            <Text h6 bold style={styles.productName}>
-              {product.name}
-            </Text>
-            <Text s1 style={styles.productPrice}>
-              {product.price.toFixed(2)} / unit
-            </Text>
-          </View>
+      {loading ? (
+        <ActivityIndicator size="large" color="#0000ff" />
+      ) : (
+        <FlatList
+          data={products}
+          nestedScrollEnabled
+          scrollEnabled={false}
+          keyExtractor={(item) => `${item.id.toString()}${item.name}`}
+          renderItem={({ item: product }) => (
+            <Flex style={styles.card}>
+              <Image style={styles.productImg} />
+              <View style={styles.productInfo}>
+                <Text h6 bold style={styles.productName} numberOfLines={1}>
+                  {product.name}
+                </Text>
+                <Text s1 style={styles.productPrice}>
+                  {product.price.toFixed(2)} / unit
+                </Text>
+              </View>
 
-          {getQuantity(product.id) > 0 ? (
-            <Flex gap={8}>
-              <Button text="-" onPress={() => increaseQuantity(product.id)} />
-              <Text h6>{getQuantity(product.id)}</Text>
-              <Button text="+" onPress={() => increaseQuantity(product.id)} />
+              {getQuantity(product.id) > 0 ? (
+                <View style={styles.quantityWrapper}>
+                  <Button
+                    text="-"
+                    onPress={() => decreaseQuantity(product.id)}
+                  />
+                  <Text h6>{getQuantity(product.id)}</Text>
+                  <Button
+                    text="+"
+                    onPress={() => increaseQuantity(product.id)}
+                  />
+                </View>
+              ) : (
+                <Button text="Add to cart" onPress={() => addToCart(product)} />
+              )}
             </Flex>
-          ) : (
-            <Button text="Add to cart" onPress={() => addToCart(product)} />
           )}
-        </Flex>
-      ))}
+        />
+      )}
     </>
   );
 };
+
 const styles = StyleSheet.create({
   card: {
     alignItems: "center",
@@ -73,15 +96,10 @@ const styles = StyleSheet.create({
     color: "gray",
     marginTop: 4,
   },
-  button: {
-    backgroundColor: "#65558F",
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 20,
-  },
-  buttonText: {
-    color: "white",
-    fontWeight: "bold",
+  quantityWrapper: {
+    flexDirection: "row",
+    gap: 8,
   },
 });
+
 export default ProductCards;

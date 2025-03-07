@@ -1,61 +1,121 @@
-import { ActivityIndicator, StyleSheet, TouchableOpacity } from "react-native";
-import { ThemedText } from "@/components/ThemedText";
-import { Flex, ScrollView } from "@/components/styled";
+import { ActivityIndicator, StyleSheet } from "react-native";
+import { ScrollView } from "@/components/styled";
 import request from "@/utils/request";
-import { useFocusEffect } from "@react-navigation/native";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import ProductCards from "@/components/ProductCard";
 import Text from "@/components/Text";
-import { router } from "expo-router";
 import ErrorPage from "@/components/ErrorPage";
+import _ from "lodash";
 
-interface RecommendProduct {
+interface Product {
   id: number;
   name: string;
   price: number;
-  imageUrl: string;
 }
 
 export default function Shopping() {
-  const [recommendProduct, setRecommendProduct] = useState<RecommendProduct[]>(
-    []
-  );
-  const [loading, setLoading] = useState(true);
-  const [isError, setIsError] = useState(false);
+  const [recommendProduct, setRecommendProduct] = useState<Product[]>([]);
+  const [latestProduct, setLatestProduct] = useState<Product[]>([]);
+  const [loadingRecommend, setLoadingRecommend] = useState(true);
+  const [loadingLatest, setLoadingLatest] = useState(true);
+  const [isErrorRecommend, setIsErrorRecommend] = useState(false);
+  const [isErrorLatest, setIsErrorLatest] = useState(false);
+  const [cursor, setCursor] = useState<string | null>(null);
+  const [isAtEnd, setIsAtEnd] = useState(true);
+  const [allCursor, setAllCursor] = useState<string[]>([]);
   const onGetRecommendProduct = async () => {
-    setLoading(true);
+    setLoadingRecommend(true);
+    setIsErrorRecommend(false);
     try {
       const res = await request.get("/recommended-products");
       setRecommendProduct(res.data);
     } catch (error) {
       console.log(error);
-      setIsError(true);
+      setIsErrorRecommend(true);
     } finally {
-      setLoading(false);
+      setLoadingRecommend(false);
     }
   };
-
+  const onGetLatestProduct = async () => {
+    !cursor && setLoadingLatest(true);
+    setIsErrorLatest(false);
+    setIsAtEnd(false);
+    if (cursor === allCursor?.[(cursor?.length || 1) - 1]) {
+      return;
+    }
+    try {
+      const res = await request.get("/products", {
+        params: {
+          cursor,
+        },
+      });
+      setLatestProduct((Prev) => _.unionBy(Prev, res.data.items, "id"));
+      setCursor(res.data.nextCursor);
+      setAllCursor((Prev) => [...Prev, cursor!]);
+    } catch (error) {
+      console.log(error);
+      setIsErrorLatest(true);
+    } finally {
+      setLoadingLatest(false);
+    }
+  };
   useEffect(() => {
     onGetRecommendProduct();
   }, []);
-  const recommendedContent = isError ? (
-    <ErrorPage refresh={onGetRecommendProduct} />
-  ) : (
-    <ProductCards products={recommendProduct} />
-  );
+  useEffect(() => {
+    isAtEnd && onGetLatestProduct();
+  }, [isAtEnd]);
+  const content = (props: {
+    isError: boolean;
+    refresh: () => void;
+    products: Product[];
+    loading?: boolean;
+    loadMoreProducts?: () => void;
+  }) => {
+    const { isError, refresh, products, loading, loadMoreProducts } = props;
+    return isError ? (
+      <ErrorPage refresh={refresh} />
+    ) : (
+      <ProductCards
+        products={products}
+        loadMoreProducts={loadMoreProducts}
+        loading={loading}
+      />
+    );
+  };
+
+  const handleScroll = (event: any) => {
+    const contentHeight = event.nativeEvent.contentSize.height;
+    const contentOffsetY = event.nativeEvent.contentOffset.y;
+    const layoutHeight = event.nativeEvent.layoutMeasurement.height;
+
+    if (contentHeight - contentOffsetY <= layoutHeight) {
+      setIsAtEnd(true);
+    } else {
+      setIsAtEnd(false);
+    }
+  };
   return (
-    <ScrollView>
+    <ScrollView onScroll={handleScroll} scrollEventThrottle={16}>
       <Text bold h2 style={styles.textHead}>
         Recommend Product
       </Text>
-      {loading ? (
-        <ActivityIndicator size="large" color="#0000ff" />
-      ) : (
-        recommendedContent
-      )}
+      {content({
+        isError: isErrorRecommend,
+        refresh: onGetRecommendProduct,
+        products: recommendProduct,
+        loading: loadingRecommend,
+      })}
       <Text bold h2 style={styles.textHead}>
         Latest Products
       </Text>
+      {content({
+        isError: isErrorLatest,
+        refresh: onGetLatestProduct,
+        products: latestProduct,
+        loading: loadingLatest,
+      })}
+      {isAtEnd && <ActivityIndicator size="large" color="#0000ff" />}
     </ScrollView>
   );
 }
