@@ -3,15 +3,19 @@ import { Flex } from "../styled";
 import { Image, StyleSheet, View } from "react-native";
 import Text from "../Text";
 import Button from "../Button";
+import { useCart } from "../context/cart";
 
 interface Props {
-  products: {
+  products?: {
     id: number;
     name: string;
     price: number;
   }[];
 }
 const ProductCards = ({ products }: Props) => {
+  const {
+    cartContext: { addToCart },
+  } = useCart();
   return (
     <>
       {products?.map((product) => (
@@ -28,7 +32,10 @@ const ProductCards = ({ products }: Props) => {
               {product.price.toFixed(2)} / unit
             </Text>
           </View>
-          <Button text="Add to cart"></Button>
+          <Button
+            text="Add to cart"
+            onPress={() => addToCart(product)}
+          ></Button>
         </Flex>
       ))}
     </>

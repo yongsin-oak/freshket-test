@@ -7,6 +7,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import ProductCards from "@/components/ProductCard";
 import Text from "@/components/Text";
 import { router } from "expo-router";
+import { useCart } from "@/components/context/cart";
 
 interface RecommendProduct {
   id: number;
@@ -19,7 +20,6 @@ export default function Shopping() {
   const [recommendProduct, setRecommendProduct] = useState<RecommendProduct[]>(
     []
   );
-
   const onGetRecommendProduct = async () => {
     try {
       const res = await request.get("/recommended-products");
@@ -35,8 +35,8 @@ export default function Shopping() {
   //   }, [])
   // );
   useEffect(() => {
-    onGetRecommendProduct()
-  },[])
+    onGetRecommendProduct();
+  }, []);
   return (
     <ScrollView>
       <Flex justify="space-between">
