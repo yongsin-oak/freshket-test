@@ -35,9 +35,9 @@ const ProductCards = ({ products }: Props) => {
           </View>
 
           {getQuantity(product.id) > 0 ? (
-            <Flex>
-              <Button text="-" onPress={() => decreaseQuantity(product.id)} />
-              <Text>{getQuantity(product.id)}</Text>
+            <Flex gap={8}>
+              <Button text="-" onPress={() => increaseQuantity(product.id)} />
+              <Text h6>{getQuantity(product.id)}</Text>
               <Button text="+" onPress={() => increaseQuantity(product.id)} />
             </Flex>
           ) : (

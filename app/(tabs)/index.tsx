@@ -38,25 +38,19 @@ export default function Shopping() {
   }, []);
   return (
     <ScrollView>
-      <Flex justify="space-between" align="center">
-        <Text bold h2>
-          Recommend Product
-        </Text>
-        <TouchableOpacity onPress={() => router.navigate("/Cart")}>
-          <Text h6>Cart</Text>
-        </TouchableOpacity>
-      </Flex>
+      <Text bold h2 style={styles.textHead}>
+        Recommend Product
+      </Text>
       <ProductCards products={recommendProduct} />
-      <Flex align="center" justify="space-between">
-        <Text bold h2>
-          Latest Products
-        </Text>
-        <TouchableOpacity onPress={() => router.navigate("/Cart")}>
-          <Text h6>Cart</Text>
-        </TouchableOpacity>
-      </Flex>
+      <Text bold h2 style={styles.textHead}>
+        Latest Products
+      </Text>
     </ScrollView>
   );
 }
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  textHead: {
+    marginBlock: 16,
+  },
+});
