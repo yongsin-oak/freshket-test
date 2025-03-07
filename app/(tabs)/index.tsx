@@ -1,50 +1,44 @@
-import {
-  Image,
-  StyleSheet,
-  Platform,
-  Touchable,
-  TouchableOpacity,
-  Text,
-  View,
-} from "react-native";
-
-import { HelloWave } from "@/components/HelloWave";
-import ParallaxScrollView from "@/components/ParallaxScrollView";
+import { StyleSheet } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
-import { ThemedView } from "@/components/ThemedView";
 import { ScrollView } from "@/components/styled";
-import { router } from "expo-router";
 import request from "@/utils/request";
 import { useFocusEffect } from "@react-navigation/native";
-import React from "react";
+import React, { useCallback, useState } from "react";
+import ProductCards from "@/components/ProductCard";
+
+interface RecommendProduct {
+  id: number;
+  name: string;
+  price: number;
+  imageUrl: string;
+}
 
 export default function Shopping() {
-  // const onGetRecommendProduct = () => {
-    
-  // };
-  // useFocusEffect(() => {
-  //   React.useCallback(() => {
-  //     onGetRecommendProduct();
-  //   }, []);
-  // });
+  const [recommendProduct, setRecommendProduct] = useState<RecommendProduct[]>(
+    []
+  );
+
+  const onGetRecommendProduct = async () => {
+    try {
+      const res = await request.get("/recommended-products");
+      setRecommendProduct(res.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      onGetRecommendProduct();
+    }, [])
+  );
+
   return (
-    <ScrollView style={{ flexDirection: "column" }}>
+    <ScrollView>
       <ThemedText type="subtitle">Recommend Product</ThemedText>
-      <View>
-        <View style={styles.productsImg}></View>
-        <View>
-          <View style={{ flexDirection: "column" }}></View>
-        </View>
-      </View>
+      <ProductCards products={recommendProduct} />
     </ScrollView>
   );
 }
 
-const styles = StyleSheet.create({
-  productsImg: {
-    width: 76,
-    height: 76,
-    borderRadius: 16,
-    backgroundColor: "red",
-  },
-});
+const styles = StyleSheet.create({});
