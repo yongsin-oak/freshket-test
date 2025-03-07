@@ -7,7 +7,6 @@ import React, { useCallback, useEffect, useState } from "react";
 import ProductCards from "@/components/ProductCard";
 import Text from "@/components/Text";
 import { router } from "expo-router";
-import { useCart } from "@/components/context/cart";
 
 interface RecommendProduct {
   id: number;
@@ -39,7 +38,7 @@ export default function Shopping() {
   }, []);
   return (
     <ScrollView>
-      <Flex justify="space-between">
+      <Flex justify="space-between" align="center">
         <Text bold h2>
           Recommend Product
         </Text>
@@ -48,6 +47,14 @@ export default function Shopping() {
         </TouchableOpacity>
       </Flex>
       <ProductCards products={recommendProduct} />
+      <Flex align="center" justify="space-between">
+        <Text bold h2>
+          Latest Products
+        </Text>
+        <TouchableOpacity onPress={() => router.navigate("/Cart")}>
+          <Text h6>Cart</Text>
+        </TouchableOpacity>
+      </Flex>
     </ScrollView>
   );
 }
