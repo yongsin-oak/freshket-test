@@ -1,6 +1,6 @@
 import React from "react";
 import { Flex } from "../styled";
-import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
+import { Image, StyleSheet, View } from "react-native";
 import Text from "../Text";
 import Button from "../Button";
 

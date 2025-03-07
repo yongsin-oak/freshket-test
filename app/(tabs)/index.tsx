@@ -1,10 +1,12 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, TouchableOpacity } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
-import { ScrollView } from "@/components/styled";
+import { Flex, ScrollView } from "@/components/styled";
 import request from "@/utils/request";
 import { useFocusEffect } from "@react-navigation/native";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import ProductCards from "@/components/ProductCard";
+import Text from "@/components/Text";
+import { router } from "expo-router";
 
 interface RecommendProduct {
   id: number;
@@ -27,15 +29,24 @@ export default function Shopping() {
     }
   };
 
-  useFocusEffect(
-    useCallback(() => {
-      onGetRecommendProduct();
-    }, [])
-  );
-
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     onGetRecommendProduct();
+  //   }, [])
+  // );
+  useEffect(() => {
+    onGetRecommendProduct()
+  },[])
   return (
     <ScrollView>
-      <ThemedText type="subtitle">Recommend Product</ThemedText>
+      <Flex justify="space-between">
+        <Text bold h2>
+          Recommend Product
+        </Text>
+        <TouchableOpacity onPress={() => router.navigate("/Cart")}>
+          <Text h6>Cart</Text>
+        </TouchableOpacity>
+      </Flex>
       <ProductCards products={recommendProduct} />
     </ScrollView>
   );

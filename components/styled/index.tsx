@@ -6,5 +6,11 @@ export const ScrollView = styled.ScrollView`
   padding-top: 48px;
 `;
 
-export const Flex = styled.View`
-  flex-direction: row;`;
+interface FlexProps {
+  justify?: string;
+}
+
+export const Flex = styled.View<FlexProps>`
+  flex-direction: row;
+  justify-content: ${(props) => props.justify || "flex-start"};
+`;
