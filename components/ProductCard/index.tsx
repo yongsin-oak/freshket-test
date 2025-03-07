@@ -2,6 +2,7 @@ import React from "react";
 import { Flex } from "../styled";
 import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
 import Text from "../Text";
+import Button from "../Button";
 
 interface Props {
   products: {
@@ -20,14 +21,14 @@ const ProductCards = ({ products }: Props) => {
             style={styles.productImg}
           />
           <View style={styles.productInfo}>
-            <Text h6 style={styles.productName}>{product.name}</Text>
+            <Text h6 bold style={styles.productName}>
+              {product.name}
+            </Text>
             <Text s1 style={styles.productPrice}>
               {product.price.toFixed(2)} / unit
             </Text>
           </View>
-          <TouchableOpacity style={styles.button}>
-            <Text style={styles.buttonText}>Add to cart</Text>
-          </TouchableOpacity>
+          <Button text="Add to cart"></Button>
         </Flex>
       ))}
     </>
