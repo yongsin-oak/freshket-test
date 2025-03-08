@@ -6,9 +6,8 @@ import Text from "@/components/Text";
 import { StyleSheet, View } from "react-native";
 import Button from "@/components/Button";
 import { useTheme } from "@emotion/react";
-import { useFocusEffect } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
-import styled from "@emotion/native";
 
 interface CartAddDiscount {
   [key: string]: number | string;
@@ -75,10 +74,13 @@ export default function Cart() {
         {cart.length === 0 ? (
           <View style={styles.emptyCart}>
             <Text h2>Empty Cart</Text>
-            <Button text="Go to shopping" />
+            <Button
+              text="Go to shopping"
+              onPress={() => router.navigate("/")}
+            />
           </View>
         ) : (
-          <ProductCards products={cart} />
+          <ProductCards swipeDelete products={cart} />
         )}
       </ScrollView>
       <View
@@ -93,7 +95,11 @@ export default function Cart() {
         </FlexFooter>
         <FlexFooter>
           <TextFooter>Promotion discount</TextFooter>
-          <Text h6>{summary("discount")}</Text>
+          <Text h6 color={theme.error}>
+            {Number(summary("discount")) > 0
+              ? "-" + summary("discount")
+              : summary("discount")}
+          </Text>
         </FlexFooter>
         <Flex
           justify="space-between"
@@ -136,7 +142,6 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   checkoutButton: {
-    height: 40,
     borderRadius: 20,
   },
 });

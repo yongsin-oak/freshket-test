@@ -31,7 +31,7 @@ export default function Shopping() {
     try {
       const res = await request.get("/recommended-products");
       setRecommendProduct(
-        res.data.map((item: Product) => ({ ...item, id: "0" + item.id }))
+        res.data.map((item: Product) => ({ ...item, id: "1" + item.id }))
       );
     } catch (error) {
       console.log(error);
@@ -58,7 +58,7 @@ export default function Shopping() {
           Prev,
           res.data.items.map((item: Product) => ({
             ...item,
-            id: "1" + item.id,
+            id: "2" + item.id,
           })),
           "id"
         )
