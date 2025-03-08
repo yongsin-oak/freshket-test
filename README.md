@@ -22,5 +22,5 @@ const request = axios.create({
   baseURL: "Your API URL",
 });
 
-MY API URL IS "http://192.168.1.133:8080/" because my IP is 192.168.1.133 and run API on PORT 8080
+My API URL is "http://192.168.1.133:8080/" because my IP is 192.168.1.133 and run API on PORT 8080
 ```
