@@ -6,34 +6,113 @@ import Text from "@/components/Text";
 import { StyleSheet, View } from "react-native";
 import Button from "@/components/Button";
 import { useTheme } from "@emotion/react";
+import { useFocusEffect } from "expo-router";
+import { useCallback, useState } from "react";
+import styled from "@emotion/native";
 
+interface CartAddDiscount {
+  [key: string]: number | string;
+  discount: number;
+  id: string;
+  name: string;
+  price: number;
+  quantity: number;
+  priceAfterDiscount: number;
+  priceBeforeDiscount: number;
+}
 export default function Cart() {
   const {
     state: { cart },
   } = useCart();
-  console.log(cart);
   const theme = useTheme();
+  const [cartAddDiscount, setCartAddDiscount] = useState<CartAddDiscount[]>([]);
+  console.log(cart);
+  const discountCal = () => {
+    const cartCal = cart.map((item) => {
+      const { quantity, price } = item;
+      const pairs = (quantity / 2) | 0;
+      const discount = pairs ? pairs * price * 0.05 : 0;
+      const priceAfterDiscount = price * quantity - discount;
+      return {
+        ...item,
+        priceAfterDiscount,
+        discount,
+        priceBeforeDiscount: price * quantity,
+      };
+    });
+    return setCartAddDiscount(cartCal);
+  };
+  const summary = (key: string) => {
+    return Number(
+      cartAddDiscount.reduce((acc, cur) => acc + Number(cur[key]), 0)
+    ).toLocaleString("th-Th", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+  };
+  useFocusEffect(
+    useCallback(() => {
+      discountCal();
+    }, [cart])
+  );
+  const FlexFooter: React.FC<{ children: React.ReactNode }> = ({
+    children,
+  }) => <Flex justify="space-between">{children}</Flex>;
+  const TextFooter: React.FC<{ children: React.ReactNode }> = ({
+    children,
+  }) => (
+    <Text h6 color={theme.primary200}>
+      {children}
+    </Text>
+  );
   return (
-    <ScrollView
-      contentContainerStyle={cart.length === 0 && styles.contentContainerStyle}
-    >
-      {cart.length === 0 ? (
-        <View style={styles.emptyCart}>
-          <Text h2>Empty Cart</Text>
-          <Button text="Go to shopping"></Button>
-        </View>
-      ) : (
-        <View>
-          <ProductCards products={cart} />
-          <View style={{ ...styles.footer, backgroundColor: theme.primary200 }}>
-            <Flex></Flex>
+    <View style={styles.containerMain}>
+      <ScrollView
+        contentContainerStyle={
+          cart.length === 0 && styles.contentContainerStyle
+        }
+      >
+        {cart.length === 0 ? (
+          <View style={styles.emptyCart}>
+            <Text h2>Empty Cart</Text>
+            <Button text="Go to shopping" />
           </View>
-        </View>
-      )}
-    </ScrollView>
+        ) : (
+          <ProductCards products={cart} />
+        )}
+      </ScrollView>
+      <View
+        style={{
+          ...styles.footer,
+          backgroundColor: theme.backgroundContainer,
+        }}
+      >
+        <FlexFooter>
+          <TextFooter>Subtotal</TextFooter>
+          <TextFooter>{summary("priceBeforeDiscount")}</TextFooter>
+        </FlexFooter>
+        <FlexFooter>
+          <TextFooter>Promotion discount</TextFooter>
+          <Text h6>{summary("discount")}</Text>
+        </FlexFooter>
+        <Flex
+          justify="space-between"
+          align="center"
+          style={styles.summaryPrice}
+        >
+          <Text h4 color={theme.primary200}>
+            {summary("priceAfterDiscount")}
+          </Text>
+          <Button text="Checkout" style={styles.checkoutButton} />
+        </Flex>
+      </View>
+    </View>
   );
 }
 const styles = StyleSheet.create({
+  containerMain: {
+    flex: 1,
+  },
   emptyCart: {
     justifyContent: "center",
     alignItems: "center",
@@ -42,15 +121,22 @@ const styles = StyleSheet.create({
   },
   contentContainerStyle: {
     flex: 1,
+    flexGrow: 1,
     justifyContent: "center",
     alignItems: "center",
   },
   footer: {
-    padding: 10,
-    marginVertical: 5,
-    bottom: 0,
+    padding: 16,
     position: "fixed",
+    bottom: 0,
     height: 170,
-    marginInline: -16,
+    gap: 16,
+  },
+  summaryPrice: {
+    marginTop: 8,
+  },
+  checkoutButton: {
+    height: 40,
+    borderRadius: 20,
   },
 });

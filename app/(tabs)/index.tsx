@@ -9,7 +9,7 @@ import _ from "lodash";
 import { useTheme } from "@emotion/react";
 
 interface Product {
-  id: number;
+  id: string;
   name: string;
   price: number;
 }
@@ -30,7 +30,9 @@ export default function Shopping() {
     setIsErrorRecommend(false);
     try {
       const res = await request.get("/recommended-products");
-      setRecommendProduct(res.data);
+      setRecommendProduct(
+        res.data.map((item: Product) => ({ ...item, id: "0" + item.id }))
+      );
     } catch (error) {
       console.log(error);
       setIsErrorRecommend(true);
@@ -51,7 +53,16 @@ export default function Shopping() {
           cursor,
         },
       });
-      setLatestProduct((Prev) => _.unionBy(Prev, res.data.items, "id"));
+      setLatestProduct((Prev) =>
+        _.unionBy(
+          Prev,
+          res.data.items.map((item: Product) => ({
+            ...item,
+            id: "1" + item.id,
+          })),
+          "id"
+        )
+      );
       setCursor(res.data.nextCursor);
       setAllCursor((Prev) => [...Prev, cursor!]);
     } catch (error) {
@@ -72,9 +83,8 @@ export default function Shopping() {
     refresh: () => void;
     products: Product[];
     loading?: boolean;
-    loadMoreProducts?: () => void;
   }) => {
-    const { isError, refresh, products, loading, loadMoreProducts } = props;
+    const { isError, refresh, products, loading } = props;
     return isError ? (
       <ErrorPage refresh={refresh} />
     ) : (

@@ -14,5 +14,6 @@ declare module "@emotion/react" {
     primary200: string;
     white: string;
     black: string;
+    backgroundContainer: string;
   }
 }

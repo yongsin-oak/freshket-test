@@ -1,10 +1,12 @@
 import React, { useMemo } from "react";
 
-interface CartItem {
-  id: number;
+interface CartProps {
+  id: string;
   name: string;
   price: number;
-  quantity?: number;
+}
+interface CartItem extends CartProps {
+  quantity: number;
 }
 
 interface State {
@@ -14,19 +16,19 @@ interface State {
 
 interface Action {
   type: string;
-  item?: CartItem;
-  id?: number;
+  item?: CartProps;
+  id?: string;
   quantity?: number;
 }
 
 interface Context {
   cartContext: {
-    addToCart: (item: CartItem) => void;
-    removeFromCart: (id: number) => void;
-    increaseQuantity: (id: number) => void;
-    decreaseQuantity: (id: number) => void;
+    addToCart: (item: CartProps) => void;
+    removeFromCart: (id: string) => void;
+    increaseQuantity: (id: string) => void;
+    decreaseQuantity: (id: string) => void;
     clearCart: () => void;
-    getQuantity: (id: number) => number;
+    getQuantity: (id: string) => number;
   };
   state: State;
 }
@@ -52,7 +54,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
             ...state,
             cart: state.cart.map((item) =>
               item.id === action.item!.id
-                ? { ...item, quantity: (item.quantity || 0) + 1 }
+                ? { ...item, quantity: item.quantity + 1 }
                 : item
             ),
           };
@@ -72,7 +74,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
           ...state,
           cart: state.cart.map((item) =>
             item.id === action.id
-              ? { ...item, quantity: (item.quantity || 0) + 1 }
+              ? { ...item, quantity: item.quantity + 1 }
               : item
           ),
         };
@@ -82,10 +84,10 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
           cart: state.cart
             .map((item) =>
               item.id === action.id
-                ? { ...item, quantity: (item.quantity || 0) - 1 }
+                ? { ...item, quantity: item.quantity - 1 }
                 : item
             )
-            .filter((item) => (item.quantity || 0) > 0),
+            .filter((item) => item.quantity > 0),
         };
       case "CLEAR_CART":
         return { ...state, cart: [] };
@@ -96,15 +98,15 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const cartContext = useMemo(
     () => ({
-      addToCart: (item: CartItem) => dispatch({ type: "ADD_TO_CART", item }),
-      removeFromCart: (id: number) =>
+      addToCart: (item: CartProps) => dispatch({ type: "ADD_TO_CART", item }),
+      removeFromCart: (id: string) =>
         dispatch({ type: "REMOVE_FROM_CART", id }),
-      increaseQuantity: (id: number) =>
+      increaseQuantity: (id: string) =>
         dispatch({ type: "INCREASE_QUANTITY", id }),
-      decreaseQuantity: (id: number) =>
+      decreaseQuantity: (id: string) =>
         dispatch({ type: "DECREASE_QUANTITY", id }),
       clearCart: () => dispatch({ type: "CLEAR_CART" }),
-      getQuantity: (id: number) =>
+      getQuantity: (id: string) =>
         state.cart.find((item) => item.id === id)?.quantity || 0,
     }),
     [state.cart]

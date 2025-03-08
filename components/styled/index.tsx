@@ -7,8 +7,13 @@ export const ScrollView = styled.ScrollView`
 `;
 
 interface FlexProps {
-  justify?: string;
-  align?: string;
+  justify?:
+    | "center"
+    | "space-between"
+    | "space-around"
+    | "flex-start"
+    | "flex-end";
+  align?: "center" | "flex-start" | "flex-end";
   gap?: number;
 }
 

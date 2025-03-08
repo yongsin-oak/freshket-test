@@ -14,7 +14,7 @@ import { useTheme } from "@emotion/react";
 
 interface Props {
   products?: {
-    id: number;
+    id: string;
     name: string;
     price: number;
     quantity?: number;
@@ -36,7 +36,7 @@ const ProductCards = ({ products, loading }: Props) => {
           data={products}
           nestedScrollEnabled
           scrollEnabled={false}
-          keyExtractor={(item) => `${item.id.toString()}${item.name}`}
+          keyExtractor={(item) => `${item.id}${item.name}`}
           renderItem={({ item: product }) => (
             <Flex style={styles.card}>
               <Image style={styles.productImg} />
@@ -51,7 +51,11 @@ const ProductCards = ({ products, loading }: Props) => {
                   {product.name}
                 </Text>
                 <Text s1 style={styles.productPrice}>
-                  {product.price.toFixed(2)} / unit
+                  {Number(product.price).toLocaleString("th-Th", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
+                  / unit
                 </Text>
               </View>
 

@@ -11,6 +11,7 @@ const colorTheme = {
   primary: "#65558F",
   primary100: "#21005D",
   primary200: "#4F378B",
+  backgroundContainer: "#E8DEF8",
 };
 
 export const Colors = {
