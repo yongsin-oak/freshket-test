@@ -10,6 +10,7 @@ import Text from "../Text";
 import Button from "../Button";
 import { useCart } from "../context/cart";
 import { Flex } from "../styled";
+import { useTheme } from "@emotion/react";
 
 interface Props {
   products?: {
@@ -19,17 +20,17 @@ interface Props {
     quantity?: number;
   }[];
   loading?: boolean;
-  loadMoreProducts?: () => void;
 }
 
-const ProductCards = ({ products, loadMoreProducts, loading }: Props) => {
+const ProductCards = ({ products, loading }: Props) => {
   const {
     cartContext: { addToCart, increaseQuantity, decreaseQuantity, getQuantity },
   } = useCart();
+  const theme = useTheme();
   return (
     <>
       {loading ? (
-        <ActivityIndicator size="large" color="#0000ff" />
+        <ActivityIndicator size="large" color={theme.primary} />
       ) : (
         <FlatList
           data={products}
@@ -40,7 +41,13 @@ const ProductCards = ({ products, loadMoreProducts, loading }: Props) => {
             <Flex style={styles.card}>
               <Image style={styles.productImg} />
               <View style={styles.productInfo}>
-                <Text h6 bold style={styles.productName} numberOfLines={1}>
+                <Text
+                  h6
+                  bold
+                  style={styles.productName}
+                  color=""
+                  numberOfLines={1}
+                >
                   {product.name}
                 </Text>
                 <Text s1 style={styles.productPrice}>
@@ -99,6 +106,7 @@ const styles = StyleSheet.create({
   quantityWrapper: {
     flexDirection: "row",
     gap: 8,
+    alignItems: "center",
   },
 });
 

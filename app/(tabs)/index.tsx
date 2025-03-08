@@ -6,6 +6,7 @@ import ProductCards from "@/components/ProductCard";
 import Text from "@/components/Text";
 import ErrorPage from "@/components/ErrorPage";
 import _ from "lodash";
+import { useTheme } from "@emotion/react";
 
 interface Product {
   id: number;
@@ -23,6 +24,7 @@ export default function Shopping() {
   const [cursor, setCursor] = useState<string | null>(null);
   const [isAtEnd, setIsAtEnd] = useState(true);
   const [allCursor, setAllCursor] = useState<string[]>([]);
+  const theme = useTheme();
   const onGetRecommendProduct = async () => {
     setLoadingRecommend(true);
     setIsErrorRecommend(false);
@@ -76,11 +78,7 @@ export default function Shopping() {
     return isError ? (
       <ErrorPage refresh={refresh} />
     ) : (
-      <ProductCards
-        products={products}
-        loadMoreProducts={loadMoreProducts}
-        loading={loading}
-      />
+      <ProductCards products={products} loading={loading} />
     );
   };
 
@@ -115,7 +113,7 @@ export default function Shopping() {
         products: latestProduct,
         loading: loadingLatest,
       })}
-      {isAtEnd && <ActivityIndicator size="large" color="#0000ff" />}
+      {isAtEnd && <ActivityIndicator size="large" color={theme.primary} />}
     </ScrollView>
   );
 }
