@@ -1,41 +1,39 @@
 import React, { useMemo } from "react";
 
-interface CartProps {
-  id: string;
+export interface CartProps {
+  id: number;
   name: string;
   price: number;
 }
-interface CartItem extends CartProps {
+export interface CartItem extends CartProps {
   quantity: number;
 }
 
 interface State {
   cart: CartItem[];
-  isLoading: boolean;
 }
 
 interface Action {
   type: string;
   item?: CartProps;
-  id?: string;
+  id?: number;
   quantity?: number;
 }
 
 interface Context {
   cartContext: {
     addToCart: (item: CartProps) => void;
-    removeFromCart: (id: string) => void;
-    increaseQuantity: (id: string) => void;
-    decreaseQuantity: (id: string) => void;
+    removeFromCart: (id: number) => void;
+    increaseQuantity: (id: number) => void;
+    decreaseQuantity: (id: number) => void;
     clearCart: () => void;
-    getQuantity: (id: string) => number;
+    getQuantity: (id: number) => number;
   };
   state: State;
 }
 
 const initialState: State = {
   cart: [],
-  isLoading: false,
 };
 
 const CartContext = React.createContext<Context | undefined>(undefined);
@@ -99,14 +97,14 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
   const cartContext = useMemo(
     () => ({
       addToCart: (item: CartProps) => dispatch({ type: "ADD_TO_CART", item }),
-      removeFromCart: (id: string) =>
+      removeFromCart: (id: number) =>
         dispatch({ type: "REMOVE_FROM_CART", id }),
-      increaseQuantity: (id: string) =>
+      increaseQuantity: (id: number) =>
         dispatch({ type: "INCREASE_QUANTITY", id }),
-      decreaseQuantity: (id: string) =>
+      decreaseQuantity: (id: number) =>
         dispatch({ type: "DECREASE_QUANTITY", id }),
       clearCart: () => dispatch({ type: "CLEAR_CART" }),
-      getQuantity: (id: string) =>
+      getQuantity: (id: number) =>
         state.cart.find((item) => item.id === id)?.quantity || 0,
     }),
     [state.cart]

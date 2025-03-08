@@ -11,17 +11,12 @@ import {
 } from "react-native";
 import Text from "../Text";
 import Button from "../Button";
-import { useCart } from "../context/cart";
+import { CartProps, useCart } from "../context/cart";
 import { Flex } from "../styled";
 import { useTheme } from "@emotion/react";
 
 interface Props {
-  products?: {
-    id: string;
-    name: string;
-    price: number;
-    quantity?: number;
-  }[];
+  products?: CartProps[];
   loading?: boolean;
   swipeDelete?: boolean;
 }

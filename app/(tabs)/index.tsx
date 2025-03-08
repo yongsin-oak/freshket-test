@@ -7,16 +7,11 @@ import Text from "@/components/Text";
 import ErrorPage from "@/components/ErrorPage";
 import _ from "lodash";
 import { useTheme } from "@emotion/react";
-
-interface Product {
-  id: string;
-  name: string;
-  price: number;
-}
+import { CartProps } from "@/components/context/cart";
 
 export default function Shopping() {
-  const [recommendProduct, setRecommendProduct] = useState<Product[]>([]);
-  const [latestProduct, setLatestProduct] = useState<Product[]>([]);
+  const [recommendProduct, setRecommendProduct] = useState<CartProps[]>([]);
+  const [latestProduct, setLatestProduct] = useState<CartProps[]>([]);
   const [loadingRecommend, setLoadingRecommend] = useState(true);
   const [loadingLatest, setLoadingLatest] = useState(true);
   const [isErrorRecommend, setIsErrorRecommend] = useState(false);
@@ -31,7 +26,10 @@ export default function Shopping() {
     try {
       const res = await request.get("/recommended-products");
       setRecommendProduct(
-        res.data.map((item: Product) => ({ ...item, id: "1" + item.id }))
+        res.data.map((item: CartProps) => ({
+          ...item,
+          id: Number("1" + item.id),
+        }))
       );
     } catch (error) {
       console.log(error);
@@ -56,9 +54,9 @@ export default function Shopping() {
       setLatestProduct((Prev) =>
         _.unionBy(
           Prev,
-          res.data.items.map((item: Product) => ({
+          res.data.items.map((item: CartProps) => ({
             ...item,
-            id: "2" + item.id,
+            id: Number("2" + item.id),
           })),
           "id"
         )
@@ -66,8 +64,8 @@ export default function Shopping() {
       setCursor(res.data.nextCursor);
       setAllCursor((Prev) => [...Prev, cursor!]);
     } catch (error) {
-      console.log(error);
       setIsErrorLatest(true);
+      throw error;
     } finally {
       setLoadingLatest(false);
     }
@@ -81,7 +79,7 @@ export default function Shopping() {
   const content = (props: {
     isError: boolean;
     refresh: () => void;
-    products: Product[];
+    products: CartProps[];
     loading?: boolean;
   }) => {
     const { isError, refresh, products, loading } = props;
